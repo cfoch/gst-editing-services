@@ -119,6 +119,12 @@ typedef struct _GESAudioUriSourceClass GESAudioUriSourceClass;
 typedef struct _GESImageSource GESImageSource;
 typedef struct _GESImageSourceClass GESImageSourceClass;
 
+typedef struct _GESImageSequenceSource GESImageSequenceSource;
+typedef struct _GESImageSequenceSourceClass GESImageSequenceSourceClass;
+
+typedef struct _GESImageSequenceClip GESImageSequenceClip;
+typedef struct _GESImageSequenceClipClass GESImageSequenceClipClass;
+
 typedef struct _GESMultiFileSource GESMultiFileSource;
 typedef struct _GESMultiFileSourceClass GESMultiFileSourceClass;
 

@@ -31,6 +31,7 @@
 #include "ges.h"
 #include "ges-internal.h"
 #include "ges-track-element-asset.h"
+#include "ges-image-sequence-source.h"
 
 static GHashTable *parent_newparent_table = NULL;
 static void
@@ -263,7 +264,7 @@ _create_uri_source_asset (GESUriClipAsset * asset,
       gst_object_ref (tck_filesource_asset));
 }
 
-static void
+void
 ges_uri_clip_asset_set_info (GESUriClipAsset * self, GstDiscovererInfo * info)
 {
   GList *tmp, *stream_list;
@@ -572,7 +573,11 @@ _extract (GESAsset * asset, GError ** error)
   if (g_str_has_prefix (priv->uri, GES_MULTI_FILE_URI_PREFIX)) {
     trackelement =
         GES_TRACK_ELEMENT (ges_multi_file_source_new (g_strdup (priv->uri)));
-  } else if (GST_IS_DISCOVERER_VIDEO_INFO (priv->sinfo)
+  } else if (g_str_has_prefix (priv->uri, "imagesequence"))
+    trackelement =
+        GES_TRACK_ELEMENT (ges_image_sequence_source_new_from_uri (g_strdup
+            (priv->uri)));
+  else if (GST_IS_DISCOVERER_VIDEO_INFO (priv->sinfo)
       && gst_discoverer_video_info_is_image ((GstDiscovererVideoInfo *)
           priv->sinfo))
     trackelement =

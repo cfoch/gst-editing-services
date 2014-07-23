@@ -21,6 +21,8 @@
 #include <ges/ges.h>
 #include "ges/gstframepositionner.h"
 #include "ges-internal.h"
+#include <stdlib.h>
+#include "ges/ges-image-sequence-clip.h"
 
 #define GES_GNONLIN_VERSION_NEEDED_MAJOR 1
 #define GES_GNONLIN_VERSION_NEEDED_MINOR 2
@@ -50,6 +52,49 @@ ges_check_gnonlin_availability (void)
   return ret;
 }
 
+/* Serialization utils for ges-formatter */
+static gchar *
+_serialize_g_strv (const GValue * value)
+{
+  gchar **filenames;
+  gchar *string, *ret;
+
+  filenames = g_value_get_boxed (value);
+  string = g_strjoinv (";", filenames);
+  ret = g_strconcat ("\"", string, "\"", NULL);
+  g_free (string);
+  return ret;
+}
+
+static gboolean
+_deserialize_g_strv (GValue * dest, const gchar * string)
+{
+  gchar **filenames;
+  gboolean ret = FALSE;
+
+  filenames = g_strsplit (string, ";", 0);
+  g_value_set_boxed (dest, filenames);
+  if (filenames)
+    ret = TRUE;
+  return ret;
+}
+
+static void
+_register_serialization (void)
+{
+  {
+    static GstValueTable value = {
+      0,
+      NULL,
+      _serialize_g_strv,
+      _deserialize_g_strv,
+    };
+
+    value.type = G_TYPE_STRV;
+    gst_value_register (&value);
+  }
+}
+
 /**
  * ges_init:
  *
@@ -75,6 +120,7 @@ ges_init (void)
   GES_TYPE_TEST_CLIP;
   GES_TYPE_URI_CLIP;
   GES_TYPE_TITLE_CLIP;
+  GES_TYPE_IMAGE_SEQUENCE_CLIP;
   GES_TYPE_TRANSITION_CLIP;
   GES_TYPE_OVERLAY_CLIP;
 
@@ -83,6 +129,8 @@ ges_init (void)
   /* register formatter types with the system */
   GES_TYPE_PITIVI_FORMATTER;
   GES_TYPE_XML_FORMATTER;
+  /* Setting serializer to G_TYPE_STRV */
+  _register_serialization ();
 
   /* Register track elements */
   GES_TYPE_EFFECT;
